@@ -1,0 +1,12 @@
+{% load production_extras %}
+{% for table in tables %}
+  <section class="panel report-table-panel">
+    <div class="panel-title"><h2>{{ table.title }}</h2><span class="panel-context">بر اساس فیلترهای بالا</span></div>
+    <div class="table-scroll">
+      <table class="rich-table">
+        <thead><tr>{% for header in table.headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+        <tbody>{% for row in table.rows %}<tr>{% for value in row %}<td>{{ value|smart_number }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </section>
+{% endfor %}

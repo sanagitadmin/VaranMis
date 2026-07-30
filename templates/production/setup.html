@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}اطلاعات نمونه{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>اطلاعات نمونه</h1>
+    <p>گروه محصول، محصول، خط، شیفت، مواد اولیه و ضایعات اولیه را برای شروع بسازید.</p>
+  </div>
+</header>
+<section class="panel setup-panel">
+  <form method="post">
+    {% csrf_token %}
+    <p>این کار داده‌های پایه نمونه را اضافه می‌کند و داده‌های قبلی را حذف نمی‌کند.</p>
+    <button class="button primary" type="submit">ساخت اطلاعات نمونه</button>
+  </form>
+</section>
+{% endblock %}

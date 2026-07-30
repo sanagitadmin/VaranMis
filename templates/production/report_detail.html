@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load production_extras %}
+{% block title %}جزئیات آمار تولید{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div><span class="eyebrow">{{ report.product.group.name }}</span><h1>جزئیات آمار تولید</h1><p>{{ report.report_date }}، {{ report.line }}، شیفت {{ report.shift }}</p></div>
+  <div class="actions detail-actions"><a class="button" href="{% url 'production:report_detail_pdf' report.pk %}">PDF</a><a class="button" href="{% url 'production:report_detail_excel' report.pk %}">Excel</a><a class="button" href="{% url 'production:report_list' %}">بازگشت</a></div>
+</header>
+<section class="record-meta">
+  <div><span>گروه محصول</span><strong>{{ report.product.group.name }}</strong></div><div><span>محصول</span><strong>{{ report.product.name }}</strong></div><div><span>اپراتور</span><strong>{{ report.operator }}</strong></div><div><span>تعداد نفرات</span><strong>{{ report.crew_count }}</strong></div>
+</section>
+<section class="kpi-grid detail-kpis">
+  <div class="kpi"><span>تولید کل</span><strong>{{ report.total_production|smart_number }}</strong><small>کیلوگرم</small></div>
+  <div class="kpi"><span>تولید مفید</span><strong>{{ report.useful_production|smart_number }}</strong><small>کیلوگرم</small></div>
+  <div class="kpi"><span>جمع ضایعات</span><strong>{{ report.total_waste|smart_number }}</strong><small>کیلوگرم</small></div>
+  <div class="kpi"><span>راندمان</span><strong>{{ report.yield_percent|smart_number }}٪</strong><small>تولید مفید از کل</small></div>
+</section>
+<section class="split">
+  <div class="panel"><div class="panel-title"><h2>مصرف مواد اولیه</h2></div><table><thead><tr><th>گروه</th><th>ماده اولیه</th><th>مقدار</th></tr></thead><tbody>{% for item in report.materials.all %}<tr><td>{{ item.material.group.name }}</td><td>{{ item.material.name }}</td><td>{{ item.quantity|smart_number }}</td></tr>{% empty %}<tr><td colspan="3">مصرفی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
+  <div class="panel"><div class="panel-title"><h2>ضایعات</h2></div><table><thead><tr><th>گروه</th><th>نوع</th><th>دسته‌بندی</th><th>مقدار</th></tr></thead><tbody>{% for item in report.wastes.all %}<tr><td>{{ item.waste_type.group.name }}</td><td>{{ item.waste_type.name }}</td><td>{{ item.waste_type.get_category_display }}</td><td>{{ item.quantity|smart_number }}</td></tr>{% empty %}<tr><td colspan="4">ضایعاتی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% if report.notes %}<section class="panel notes-panel"><div class="panel-title"><h2>توضیحات ثبت</h2></div><p>{{ report.notes }}</p></section>{% endif %}
+{% endblock %}

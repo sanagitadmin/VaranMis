@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}مرکز گزارش‌های مدیریتی{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div><span class="eyebrow">گزارش بر اساس کاربرد</span><h1>مرکز گزارش‌های مدیریتی</h1><p>هر گزارش برای یک تصمیم مشخص طراحی شده و خروجی PDF و Excel دارد.</p></div>
+</header>
+<section class="report-catalog">
+  <a class="report-card featured" href="{% url 'production:executive_report' %}"><span class="report-index">01</span><div><strong>راهبری و عملکرد کلان</strong><p>حجم، راندمان، روند و نقاط نیازمند تصمیم برای مدیرعامل و مدیر کارخانه</p></div><span class="report-arrow">←</span></a>
+  <a class="report-card" href="{% url 'production:operations_report' %}"><span class="report-index">02</span><div><strong>عملیات تولید</strong><p>کنترل خطوط، شیفت‌ها، اپراتورها، مواد اولیه و انواع ضایعات</p></div><span class="report-arrow">←</span></a>
+  <a class="report-card" href="{% url 'production:planning_report' %}"><span class="report-index">03</span><div><strong>برنامه‌ریزی تولید</strong><p>ریتم روزانه و ماهانه، ترکیب محصول و برآورد ظرفیت قابل اتکا</p></div><span class="report-arrow">←</span></a>
+  <a class="report-card" href="{% url 'production:sales_report' %}"><span class="report-index">04</span><div><strong>تأمین قابل عرضه</strong><p>تولید مفید به تفکیک محصول و گروه برای تصمیم‌های فروش</p></div><span class="report-arrow">←</span></a>
+  <a class="report-card" href="{% url 'production:daily_report' %}"><span class="report-index">05</span><div><strong>روزانه تولید</strong><p>هفت روز اخیر همراه جزئیات گروه محصول، خط، شیفت و محصول</p></div><span class="report-arrow">←</span></a>
+  <a class="report-card" href="{% url 'production:comparison_report' %}"><span class="report-index">06</span><div><strong>مقایسه‌ای جامع</strong><p>مقایسه روزانه، ماهانه، گروه‌های محصول، خطوط و محصولات</p></div><span class="report-arrow">←</span></a>
+</section>
+{% endblock %}

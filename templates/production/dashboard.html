@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}داشبورد مدیریتی تولید{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div><span class="eyebrow">تصویر خلاصه عملکرد</span><h1>داشبورد مدیریتی تولید</h1><p>شاخص‌های تصمیم‌ساز از {{ start }} تا {{ end }}؛ مقایسه با {{ previous_start }} تا {{ previous_end }}</p></div>
+  <a class="button" href="{% url 'production:reports_hub' %}">گزارش‌های تخصصی</a>
+</header>
+{% include "production/_report_filters.html" %}
+{% include "production/_kpis.html" %}
+<section class="insight-grid compact-insights">
+  {% for insight in insights %}<article class="insight {% if insight.alert %}alert{% endif %}"><span>{{ insight.label }}</span><strong>{{ insight.value }}</strong><small>{{ insight.detail }}</small></article>{% endfor %}
+</section>
+{% include "production/_charts.html" %}
+{% with tables=dashboard_tables %}{% include "production/_tables.html" %}{% endwith %}
+<script src="{% static 'production/charts.js' %}"></script>
+<script src="{% static 'production/report_filters.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+<section class="chart-grid">
+  {% for chart in charts %}
+    <article class="panel chart-panel">
+      <div class="panel-title"><h2>{{ chart.title }}</h2><span class="panel-context">{{ start }} تا {{ end }}</span></div>
+      <canvas class="chart report-chart" id="{{ chart.id }}" data-labels="{{ chart.labels_id }}" data-values="{{ chart.values_id }}" data-color="{{ chart.color }}"></canvas>
+      {{ chart.labels|json_script:chart.labels_id }}
+      {{ chart.values|json_script:chart.values_id }}
+    </article>
+  {% endfor %}
+</section>

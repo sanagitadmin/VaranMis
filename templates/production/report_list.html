@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static production_extras %}
+{% block title %}آمار ثبت‌شده تولید{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div><span class="eyebrow">داده عملیاتی</span><h1>آمار ثبت‌شده تولید</h1><p>جزئیات هر ثبت با تفکیک گروه محصول، خط، تاریخ و شیفت</p></div>
+  {% if can_register_reports %}<a class="button primary" href="{% url 'production:report_create' %}">ثبت آمار جدید</a>{% endif %}
+</header>
+{% include "production/_report_filters.html" %}
+<section class="kpi-strip">
+  <div><span>تولید کل</span><strong>{{ totals.total_production|smart_number }}</strong></div>
+  <div><span>تولید مفید</span><strong>{{ totals.useful_production|smart_number }}</strong></div>
+  <div><span>راندمان</span><strong>{{ totals.yield_percent }}٪</strong></div>
+  <div><span>ضایعات</span><strong>{{ totals.waste_total|smart_number }}</strong></div>
+</section>
+<section class="panel report-table-panel">
+  <div class="panel-title"><h2>جزئیات ثبت‌ها</h2><span class="panel-context">{{ start }} تا {{ end }}</span></div>
+  <div class="table-scroll">
+    <table class="rich-table">
+      <thead><tr><th>تاریخ</th><th>گروه محصول</th><th>خط</th><th>شیفت</th><th>محصول</th><th>اپراتور</th><th>نفرات</th><th>تولید کل</th><th>تولید مفید</th><th>ضایعات</th><th>راندمان</th></tr></thead>
+      <tbody>
+      {% for report in reports %}
+        <tr><td><a class="detail-link" href="{% url 'production:report_detail' report.pk %}">{{ report.report_date }}</a></td><td>{{ report.product.group.name }}</td><td>{{ report.line }}</td><td>{{ report.shift }}</td><td>{{ report.product.name }}</td><td>{{ report.operator }}</td><td>{{ report.crew_count }}</td><td>{{ report.total_production|smart_number }}</td><td>{{ report.useful_production|smart_number }}</td><td>{{ report.total_waste|smart_number }}</td><td><span class="metric-pill">{{ report.yield_percent|smart_number }}٪</span></td></tr>
+      {% empty %}<tr><td colspan="11">برای فیلتر انتخاب‌شده داده‌ای وجود ندارد.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<script src="{% static 'production/report_filters.js' %}"></script>
+{% endblock %}

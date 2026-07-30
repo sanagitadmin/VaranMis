@@ -1,0 +1,13 @@
+{% load production_extras %}
+<section class="kpi-grid executive-kpis">
+  {% for kpi in kpis %}
+    <article class="kpi">
+      <span>{{ kpi.label }}</span>
+      <strong>{{ kpi.value|smart_number }}</strong>
+      <div class="kpi-meta">
+        <small>{{ kpi.unit }}</small>
+        {% if kpi.delta != None %}<small class="delta {% if kpi.delta > 0 %}up{% elif kpi.delta < 0 %}down{% endif %}">{{ kpi.delta }}٪ نسبت به دوره قبل</small>{% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</section>

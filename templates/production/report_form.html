@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}ثبت گزارش تولید{% endblock %}
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>ثبت گزارش تولید</h1>
+    <p>تاریخ، شیفت، اپراتور، خط، محصول، تولید، مواد مصرفی و ضایعات را ثبت کنید.</p>
+  </div>
+</header>
+
+<form method="post" class="form-page">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <section class="panel error-panel">
+      {% for error in form.non_field_errors %}
+        <p class="error">{{ error }}</p>
+      {% endfor %}
+    </section>
+  {% endif %}
+  <section class="panel">
+    <h2>اطلاعات اصلی</h2>
+    <div class="form-grid">
+      {% for field in form %}
+        <label>
+          <span>{{ field.label }}</span>
+          {{ field }}
+          {% for error in field.errors %}<small class="error">{{ error }}</small>{% endfor %}
+        </label>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>مصرف مواد اولیه</h2>
+      <button class="button compact" type="button" data-add-row="materials">افزودن ردیف</button>
+    </div>
+    {{ material_formset.management_form }}
+    {% for error in material_formset.non_form_errors %}
+      <small class="error">{{ error }}</small>
+    {% endfor %}
+    <div class="inline-grid" data-formset="materials">
+      {% for row in material_formset %}
+        <div class="inline-row" data-form-row>
+          {{ row.id }}
+          <label><span>ماده</span>{{ row.material }}</label>
+          <label><span>مقدار</span>{{ row.quantity }}</label>
+          <label class="delete">{{ row.DELETE }} حذف</label>
+          {% for error in row.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <template data-empty-form="materials">
+      <div class="inline-row" data-form-row>
+        {{ material_formset.empty_form.id }}
+        <label><span>ماده</span>{{ material_formset.empty_form.material }}</label>
+        <label><span>مقدار</span>{{ material_formset.empty_form.quantity }}</label>
+        <label class="delete">{{ material_formset.empty_form.DELETE }} حذف</label>
+      </div>
+    </template>
+    <div class="form-summary">جمع مواد اولیه: <strong data-total="materials">0</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title">
+      <h2>ضایعات</h2>
+      <button class="button compact" type="button" data-add-row="wastes">افزودن ردیف</button>
+    </div>
+    {{ waste_formset.management_form }}
+    {% for error in waste_formset.non_form_errors %}
+      <small class="error">{{ error }}</small>
+    {% endfor %}
+    <div class="inline-grid" data-formset="wastes">
+      {% for row in waste_formset %}
+        <div class="inline-row" data-form-row>
+          {{ row.id }}
+          <label><span>نوع ضایعات</span>{{ row.waste_type }}</label>
+          <label><span>مقدار</span>{{ row.quantity }}</label>
+          <label class="delete">{{ row.DELETE }} حذف</label>
+          {% for error in row.non_field_errors %}<small class="error">{{ error }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <template data-empty-form="wastes">
+      <div class="inline-row" data-form-row>
+        {{ waste_formset.empty_form.id }}
+        <label><span>نوع ضایعات</span>{{ waste_formset.empty_form.waste_type }}</label>
+        <label><span>مقدار</span>{{ waste_formset.empty_form.quantity }}</label>
+        <label class="delete">{{ waste_formset.empty_form.DELETE }} حذف</label>
+      </div>
+    </template>
+    <div class="form-summary">جمع ضایعات: <strong data-total="wastes">0</strong></div>
+  </section>
+
+  <div class="actions">
+    <button class="button primary" type="submit">ثبت گزارش</button>
+    <a class="button" href="{% url 'production:dashboard' %}">بازگشت</a>
+  </div>
+</form>
+{% load static %}
+<script src="{% static 'production/cascade.js' %}"></script>
+{% endblock %}

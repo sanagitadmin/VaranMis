@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ config.title }}{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div><span class="eyebrow">{{ config.audience }}</span><h1>{{ config.title }}</h1><p>{{ config.purpose }}</p></div>
+  <a class="button" href="{% url 'production:reports_hub' %}">همه گزارش‌ها</a>
+</header>
+{% include "production/_report_filters.html" %}
+<div class="period-note">مقایسه با دوره مشابه قبلی: {{ previous_start }} تا {{ previous_end }}</div>
+{% include "production/_kpis.html" %}
+<section class="insight-grid">
+  {% for insight in insights %}<article class="insight {% if insight.alert %}alert{% endif %}"><span>{{ insight.label }}</span><strong>{{ insight.value }}</strong><small>{{ insight.detail }}</small></article>{% endfor %}
+</section>
+{% include "production/_charts.html" %}
+{% include "production/_tables.html" %}
+<script src="{% static 'production/charts.js' %}"></script>
+<script src="{% static 'production/report_filters.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}سامانه تولید واران{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'production/styles.css' %}">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">V</span>
+      <div>
+        <strong>واران MIS</strong>
+        <small>ثبت و تحلیل تولید</small>
+      </div>
+    </div>
+    <nav>
+      <a href="{% url 'production:dashboard' %}">داشبورد</a>
+      {% if can_register_reports %}
+        <a href="{% url 'production:report_create' %}">ثبت گزارش</a>
+      {% endif %}
+      <a href="{% url 'production:reports_hub' %}">مرکز گزارش‌ها</a>
+      <a href="{% url 'production:report_list' %}">آمار ثبت‌شده</a>
+      <a href="{% url 'production:daily_report' %}">آمار روزانه</a>
+      <a href="{% url 'production:comparison_report' %}">مقایسه تولید</a>
+      {% if can_manage_settings %}
+        <a href="{% url 'production:setup' %}">اطلاعات نمونه</a>
+        <a href="/admin/">مدیریت</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+        <form class="nav-logout" method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">خروج</button>
+        </form>
+      {% endif %}
+    </nav>
+  </aside>
+  <main class="main">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
