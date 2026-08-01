@@ -7,3 +7,6 @@ tmp/
 .env
 .idea/
 .vscode/
+
+# Visual Studio temporary files
+.vs/

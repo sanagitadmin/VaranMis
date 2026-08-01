@@ -74,6 +74,13 @@ class Shift(models.Model):
 
 
 class Operator(models.Model):
+    group = models.ForeignKey(
+        ProductGroup,
+        verbose_name="گروه محصول",
+        related_name="operators",
+        on_delete=models.PROTECT,
+        null=True,
+    )
     full_name = models.CharField("نام و نام خانوادگی", max_length=160)
     personnel_code = models.CharField("کد پرسنلی", max_length=40, blank=True, unique=True, null=True)
     is_active = models.BooleanField("فعال", default=True)
@@ -81,7 +88,7 @@ class Operator(models.Model):
     class Meta:
         verbose_name = "اپراتور"
         verbose_name_plural = "اپراتورها"
-        ordering = ["full_name"]
+        ordering = ["group__name", "full_name"]
 
     def __str__(self):
         return self.full_name
@@ -220,6 +227,8 @@ class ProductionReport(models.Model):
             raise ValidationError({"useful_production": "تولید مفید نمی‌تواند از تولید کل بیشتر باشد."})
         if self.line_id and self.product_id and self.line.group_id and self.product.group_id != self.line.group_id:
             raise ValidationError({"line": "خط تولید و محصول باید از یک گروه محصول باشند."})
+        if self.line_id and self.operator_id and self.line.group_id and self.operator.group_id != self.line.group_id:
+            raise ValidationError({"operator": "اپراتور باید متعلق به گروه محصول خط تولید باشد."})
 
 
 class MaterialConsumption(models.Model):

@@ -57,6 +57,7 @@ class ProductionReportForm(forms.ModelForm):
         ]
         widgets = {
             "report_date": DateInput(),
+            "operator": GroupedSelect(attrs={"data-cascade": "operator"}),
             "line": GroupedSelect(attrs={"data-cascade": "line"}),
             "product": GroupedSelect(attrs={"data-cascade": "product"}),
             "notes": forms.Textarea(attrs={"rows": 3}),
@@ -66,18 +67,25 @@ class ProductionReportForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields["product_group"].initial = self.instance.product.group_id
+        elif not self.is_bound:
+            first_group = self.fields["product_group"].queryset.first()
+            if first_group:
+                self.fields["product_group"].initial = first_group.pk
 
     def clean(self):
         cleaned = super().clean()
         group = cleaned.get("product_group")
         line = cleaned.get("line")
         product = cleaned.get("product")
+        operator = cleaned.get("operator")
         report_date = cleaned.get("report_date")
         shift = cleaned.get("shift")
         if group and line and line.group_id != group.id:
             self.add_error("line", "خط تولید باید متعلق به گروه محصول انتخاب‌شده باشد.")
         if group and product and product.group_id != group.id:
             self.add_error("product", "محصول باید متعلق به گروه محصول انتخاب‌شده باشد.")
+        if group and operator and operator.group_id != group.id:
+            self.add_error("operator", "اپراتور باید متعلق به گروه محصول انتخاب‌شده باشد.")
         if report_date and report_date > timezone.localdate():
             self.add_error("report_date", "تاریخ گزارش نمی‌تواند آینده باشد.")
         if report_date and shift and line:

@@ -24,7 +24,7 @@ class ProductionReportTests(TestCase):
         self.product = Product.objects.create(group=self.group, name="هاتواش شفاف")
         self.line = ProductionLine.objects.create(group=self.group, name="خط هاتواش")
         self.shift = Shift.objects.create(name="صبح", starts_at="07:00", ends_at="15:00")
-        self.operator = Operator.objects.create(full_name="اپراتور تست", personnel_code="T-001")
+        self.operator = Operator.objects.create(group=self.group, full_name="اپراتور تست", personnel_code="T-001")
         self.material = RawMaterial.objects.create(group=self.group, name="پرک")
         self.waste_type = WasteType.objects.create(
             group=self.group,
@@ -145,6 +145,20 @@ class ProductionReportTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ProductionReport.objects.count(), 1)
+
+    def test_rejects_operator_from_other_product_group(self):
+        other_group = ProductGroup.objects.create(name="پت")
+        other_operator = Operator.objects.create(group=other_group, full_name="اپراتور پت", personnel_code="P-001")
+        client = self.registrar_client()
+
+        response = client.post(
+            reverse("production:report_create"),
+            self.report_payload(operator=other_operator.id),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "اپراتور باید متعلق به گروه محصول انتخاب‌شده باشد")
+        self.assertEqual(ProductionReport.objects.count(), 0)
 
     def test_create_form_starts_with_one_inline_row(self):
         client = self.registrar_client()

@@ -52,7 +52,11 @@ class ProductionLineAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Shift)
-admin.site.register(Operator)
+@admin.register(Operator)
+class OperatorAdmin(admin.ModelAdmin):
+    list_display = ("full_name", "group", "personnel_code", "is_active")
+    list_filter = ("group", "is_active")
+    search_fields = ("full_name", "personnel_code")
 
 
 @admin.register(RawMaterial)

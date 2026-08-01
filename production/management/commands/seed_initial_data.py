@@ -44,7 +44,10 @@ class Command(BaseCommand):
         Shift.objects.get_or_create(name="عصر", defaults={"starts_at": "15:00", "ends_at": "23:00"})
         Shift.objects.get_or_create(name="شب", defaults={"starts_at": "23:00", "ends_at": "07:00"})
 
-        Operator.objects.get_or_create(full_name="اپراتور نمونه", defaults={"personnel_code": "OP-001"})
+        Operator.objects.get_or_create(
+            full_name="اپراتور نمونه",
+            defaults={"group": hotwash, "personnel_code": "OP-001"},
+        )
 
         material_names = ["هاتواش", "گرانول", "پرک", "پریفورم", "ON", "OFF"]
         for group in [pet, flake, hotwash, granule]:
