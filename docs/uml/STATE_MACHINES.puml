@@ -1,0 +1,25 @@
+@startuml
+title Varan MIS - State Machines
+
+state "Production Report" as Report {
+  [*] --> DraftForm
+  DraftForm --> ValidationFailed : invalid form/formset
+  ValidationFailed --> DraftForm : user corrects
+  DraftForm --> Saved : valid create
+  Saved --> Edited : valid update
+  Edited --> Saved : persisted
+  Saved --> Deleted : Registrar/Admin delete
+  Deleted --> [*]
+}
+
+state "Access Result" as Access {
+  [*] --> Anonymous
+  Anonymous --> LoginRequired : protected page
+  LoginRequired --> Authenticated : successful login
+  Authenticated --> Authorized : has required group or superuser
+  Authenticated --> Forbidden : missing role
+  Authorized --> [*]
+  Forbidden --> [*]
+}
+
+@enduml

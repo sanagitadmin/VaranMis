@@ -1,0 +1,30 @@
+@startuml
+title Varan MIS - Authentication and Authorization
+
+actor User
+participant Browser
+participant "Django auth" as Auth
+participant "production.permissions" as Perm
+participant "View" as View
+
+User -> Browser : request protected URL
+Browser -> Auth : session cookie
+alt not authenticated
+  Auth -> Browser : redirect to login
+else authenticated
+  Auth -> Perm : check groups/superuser
+  alt allowed
+    Perm -> View : continue
+    View -> Browser : render response
+  else denied
+    Perm -> Browser : return forbidden/redirect
+  end
+end
+
+note right of Perm
+Roles:
+Admin, Registrar, Viewer.
+Superuser is treated as Admin.
+end note
+
+@enduml

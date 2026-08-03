@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+set -eu
+
+echo "Post-merge repository status:"
+git status --short --branch
+
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null | grep -q '^requirements\.txt$'; then
+  echo "requirements.txt changed. Reinstall dependencies in your virtualenv."
+fi
+
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null | grep -q '^production/migrations/'; then
+  echo "Django migrations changed. Run manage.py migrate before using the app."
+fi
+
+echo
+echo "--- docs/CURRENT_STATUS.md ---"
+sed -n '1,80p' docs/CURRENT_STATUS.md 2>/dev/null || true
+echo
+echo "--- docs/HANDOFF.md ---"
+sed -n '1,120p' docs/HANDOFF.md 2>/dev/null || true

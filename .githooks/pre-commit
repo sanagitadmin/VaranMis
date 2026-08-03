@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+set -eu
+
+staged="$(git diff --cached --name-only)"
+[ -n "$staged" ] || exit 0
+
+code_changed="$(printf '%s\n' "$staged" | grep -E '^(production|varanmis|templates|static)/|^requirements\.txt$|^passenger_wsgi\.py$|^manage\.py$' || true)"
+docs_changed="$(printf '%s\n' "$staged" | grep -E '^(docs/|AGENTS\.md|README\.md|\.github/|\.githooks/|scripts/)' || true)"
+
+if [ -n "$code_changed" ] && [ -z "$docs_changed" ]; then
+  echo "Code or runtime files changed, but no project-memory docs/scripts changed." >&2
+  echo "Update the related docs listed in AGENTS.md or explicitly stage the documentation decision." >&2
+  exit 1
+fi
+
+if [ -n "$docs_changed" ]; then
+  if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -File scripts/validate-docs.ps1
+  elif command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate-docs.ps1
+  else
+    sh scripts/validate-docs.sh
+  fi
+fi

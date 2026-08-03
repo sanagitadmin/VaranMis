@@ -1,0 +1,31 @@
+@startuml
+title Varan MIS - Deployment Diagram
+
+node "Developer Machine" {
+  artifact "Git checkout" as Checkout
+  artifact ".venv" as LocalVenv
+  database "db.sqlite3\nignored local data" as DevDb
+}
+
+node "GitHub" {
+  artifact "origin/master" as Origin
+  artifact "GitHub Actions" as Actions
+}
+
+node "Linux VPS 178.62.19.198" {
+  artifact "/opt/varanmis/app" as ProdApp
+  artifact "systemd service: varanmis" as Service
+  artifact "Nginx site" as Nginx
+  database "/opt/varanmis/data/db.sqlite3" as ProdDb
+  artifact "Let's Encrypt certificate" as Cert
+}
+
+Checkout --> Origin : push/pull
+Actions --> Origin : validate docs/check/tests
+Origin --> ProdApp : deploy source
+Service --> ProdApp : runs Django
+ProdApp --> ProdDb
+Nginx --> Service : reverse proxy
+Nginx --> Cert : TLS
+
+@enduml

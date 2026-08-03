@@ -1,0 +1,115 @@
+@startuml
+title Varan MIS - Database ERD
+
+entity product_group {
+  * id : integer
+  --
+  * name : varchar unique
+  description : text
+}
+
+entity product {
+  * id : integer
+  --
+  * group_id : fk
+  * name : varchar
+  code : varchar
+  * is_active : boolean
+}
+
+entity production_line {
+  * id : integer
+  --
+  group_id : fk
+  * name : varchar unique
+  code : varchar
+  * is_active : boolean
+}
+
+entity shift {
+  * id : integer
+  --
+  * name : varchar unique
+  starts_at : time
+  ends_at : time
+}
+
+entity operator {
+  * id : integer
+  --
+  group_id : fk
+  * full_name : varchar
+  personnel_code : varchar unique nullable
+  * is_active : boolean
+}
+
+entity raw_material {
+  * id : integer
+  --
+  group_id : fk
+  * name : varchar
+  * unit : varchar
+  * is_active : boolean
+}
+
+entity waste_type {
+  * id : integer
+  --
+  group_id : fk
+  * name : varchar
+  * category : reusable|saleable|disposal
+  * is_active : boolean
+}
+
+entity production_report {
+  * id : integer
+  --
+  * report_date : date
+  * shift_id : fk
+  * operator_id : fk
+  * crew_count : integer
+  * line_id : fk
+  * product_id : fk
+  * total_production : decimal
+  * useful_production : decimal
+  notes : text
+  * created_at : datetime
+  * updated_at : datetime
+}
+
+entity material_consumption {
+  * id : integer
+  --
+  * report_id : fk
+  * material_id : fk
+  * quantity : decimal
+}
+
+entity waste_entry {
+  * id : integer
+  --
+  * report_id : fk
+  * waste_type_id : fk
+  * quantity : decimal
+}
+
+product_group ||--o{ product
+product_group ||--o{ production_line
+product_group ||--o{ operator
+product_group ||--o{ raw_material
+product_group ||--o{ waste_type
+shift ||--o{ production_report
+operator ||--o{ production_report
+production_line ||--o{ production_report
+product ||--o{ production_report
+production_report ||--o{ material_consumption
+production_report ||--o{ waste_entry
+raw_material ||--o{ material_consumption
+waste_type ||--o{ waste_entry
+
+note bottom of production_report
+Unique constraint:
+report_date + line_id + shift_id
+end note
+
+@enduml

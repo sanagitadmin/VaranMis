@@ -1,0 +1,30 @@
+name: Feature request
+description: Request a new capability or report
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Business need
+      description: Who needs this and why?
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Desired behavior
+    validations:
+      required: true
+  - type: textarea
+    id: filters
+    attributes:
+      label: Filters, roles, and exports
+  - type: textarea
+    id: metrics
+    attributes:
+      label: KPIs or calculations
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation updates expected

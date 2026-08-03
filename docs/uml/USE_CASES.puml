@@ -1,0 +1,45 @@
+@startuml
+title Varan MIS - Use Cases
+
+left to right direction
+actor Admin
+actor Registrar
+actor Viewer
+
+rectangle "Varan MIS" {
+  usecase "Login" as UCLogin
+  usecase "Manage master data" as UCMaster
+  usecase "Create production report" as UCCreate
+  usecase "Edit production report" as UCEdit
+  usecase "Delete production report" as UCDelete
+  usecase "View dashboard" as UCDashboard
+  usecase "View reports" as UCReports
+  usecase "Export PDF" as UCPdf
+  usecase "Export Excel" as UCExcel
+  usecase "Admin panel" as UCAdmin
+}
+
+Admin --> UCLogin
+Admin --> UCMaster
+Admin --> UCAdmin
+Admin --> UCDashboard
+Admin --> UCReports
+Admin --> UCPdf
+Admin --> UCExcel
+
+Registrar --> UCLogin
+Registrar --> UCCreate
+Registrar --> UCEdit
+Registrar --> UCDelete
+Registrar --> UCDashboard
+Registrar --> UCReports
+Registrar --> UCPdf
+Registrar --> UCExcel
+
+Viewer --> UCLogin
+Viewer --> UCDashboard
+Viewer --> UCReports
+Viewer --> UCPdf
+Viewer --> UCExcel
+
+@enduml

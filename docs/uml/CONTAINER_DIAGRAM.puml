@@ -1,0 +1,29 @@
+@startuml
+title Varan MIS - Container Diagram
+
+actor User
+
+node "Client Device" {
+  component "Web Browser" as Browser
+}
+
+node "Production VPS" {
+  component "Nginx HTTPS Reverse Proxy" as Nginx
+  component "Django Application\nvaranmis + production" as Django
+  database "SQLite file\n/opt/varanmis/data/db.sqlite3" as SQLite
+  folder "Static Assets" as Static
+}
+
+node "Developer PC" {
+  component "Python Virtualenv" as Venv
+  database "Local SQLite\ndb.sqlite3" as LocalDb
+}
+
+User --> Browser
+Browser --> Nginx : HTTPS
+Nginx --> Django : local upstream
+Django --> SQLite : ORM
+Django --> Static : collectstatic output
+Venv --> LocalDb : local run/tests
+
+@enduml

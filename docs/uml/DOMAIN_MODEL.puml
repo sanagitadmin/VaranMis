@@ -1,0 +1,83 @@
+@startuml
+title Varan MIS - Domain Model
+
+class ProductGroup {
+  name
+  description
+}
+
+class Product {
+  group
+  name
+  code
+  is_active
+}
+
+class ProductionLine {
+  group
+  name
+  code
+  is_active
+}
+
+class Shift {
+  name
+  starts_at
+  ends_at
+}
+
+class Operator {
+  group
+  full_name
+  personnel_code
+  is_active
+}
+
+class RawMaterial {
+  group
+  name
+  unit
+  is_active
+}
+
+class WasteType {
+  group
+  name
+  category
+  is_active
+}
+
+class ProductionReport {
+  report_date
+  crew_count
+  total_production
+  useful_production
+  notes
+  total_waste()
+  yield_percent()
+  waste_percent()
+}
+
+class MaterialConsumption {
+  quantity
+}
+
+class WasteEntry {
+  quantity
+}
+
+ProductGroup "1" -- "many" Product
+ProductGroup "1" -- "many" ProductionLine
+ProductGroup "1" -- "many" Operator
+ProductGroup "1" -- "many" RawMaterial
+ProductGroup "1" -- "many" WasteType
+ProductionLine "1" -- "many" ProductionReport
+Product "1" -- "many" ProductionReport
+Shift "1" -- "many" ProductionReport
+Operator "1" -- "many" ProductionReport
+ProductionReport "1" -- "many" MaterialConsumption
+ProductionReport "1" -- "many" WasteEntry
+RawMaterial "1" -- "many" MaterialConsumption
+WasteType "1" -- "many" WasteEntry
+
+@enduml

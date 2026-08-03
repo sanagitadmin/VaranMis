@@ -1,0 +1,23 @@
+name: Technical task
+description: Track engineering, security, deployment, or documentation work
+title: "[Task]: "
+labels: ["technical"]
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation plan
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation and handoff updates

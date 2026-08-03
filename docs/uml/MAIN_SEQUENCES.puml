@@ -1,0 +1,32 @@
+@startuml
+title Varan MIS - Main Sequences
+
+actor Registrar
+participant Browser
+participant "views.py" as Views
+participant "ProductionReportForm" as Form
+participant "Inline FormSets" as Formsets
+participant "models.py" as Models
+database SQLite
+
+Registrar -> Browser : submit daily report
+Browser -> Views : POST /reports/new/
+Views -> Form : validate header
+Views -> Formsets : validate materials/wastes
+Form -> Models : clean group/date/business rules
+Formsets -> Models : clean positive quantities/group match
+Models -> SQLite : save report and rows
+Views -> Browser : redirect to detail
+
+== Export ==
+actor Viewer
+participant "analytics.py" as Analytics
+participant "pdf_reports.py / excel_reports.py" as Exporter
+
+Viewer -> Browser : click PDF or Excel
+Browser -> Views : GET export URL
+Views -> Analytics : aggregate filtered reports
+Views -> Exporter : build management output
+Exporter -> Browser : file response
+
+@enduml

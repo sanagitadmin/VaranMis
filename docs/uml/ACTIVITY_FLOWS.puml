@@ -1,0 +1,28 @@
+@startuml
+title Varan MIS - Activity Flows
+
+start
+:User opens new production report;
+:Select product group;
+:UI filters line, product, operator, material, and waste choices;
+:Enter date, shift, crew count, total and useful production;
+:Add material rows as needed;
+:Add waste rows as needed;
+if (Duplicate date + line + shift?) then (yes)
+  :Show validation error;
+  stop
+endif
+if (Useful production > total production?) then (yes)
+  :Show validation error;
+  stop
+endif
+if (Group mismatch?) then (yes)
+  :Show validation error;
+  stop
+endif
+:Save report;
+:Open detail page;
+:User may export PDF/Excel;
+stop
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title Varan MIS - System Context
+
+actor Admin
+actor Registrar
+actor Viewer
+
+rectangle "User Browser" as Browser
+rectangle "Varan MIS Django App" as App
+database "SQLite Database" as DB
+cloud "Linux VPS\nNginx + systemd + HTTPS" as VPS
+rectangle "GitHub Repository" as GitHub
+
+Admin --> Browser : manage master data\nview reports
+Registrar --> Browser : register/edit/delete reports
+Viewer --> Browser : view dashboard/reports
+Browser --> App : HTTP/HTTPS requests
+App --> DB : ORM read/write
+VPS --> App : reverse proxy to app service
+GitHub --> VPS : deploy source by pull/copy
+GitHub --> Browser : project documentation
+
+note right of App
+Server-rendered Django app.
+No public JSON API exists yet.
+end note
+
+@enduml

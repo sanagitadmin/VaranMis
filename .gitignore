@@ -2,11 +2,26 @@
 __pycache__/
 *.py[cod]
 db.sqlite3
+*.sqlite3
+*.db
 staticfiles/
 tmp/
 .env
+.env.*
+!.env.example
 .idea/
 .vscode/
+node_modules/
+dist/
+build/
+coverage/
+*.log
+*.tmp
+*.bak
+*.secret
+*.key
+*.pem
+*.pfx
 
 # Visual Studio temporary files
 .vs/

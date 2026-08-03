@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+set -eu
+
+if command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -File scripts/validate-docs.ps1
+elif command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate-docs.ps1
+else
+  sh scripts/validate-docs.sh
+fi
+
+if [ "${SKIP_PRE_PUSH_TESTS:-0}" = "1" ]; then
+  echo "SKIP_PRE_PUSH_TESTS=1 set; skipping Django check/test."
+  exit 0
+fi
+
+py="python"
+[ -x ".venv/Scripts/python.exe" ] && py=".venv/Scripts/python.exe"
+[ -x ".venv/bin/python" ] && py=".venv/bin/python"
+
+"$py" manage.py check
+"$py" manage.py test

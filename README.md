@@ -1,55 +1,56 @@
 # Varan MIS
 
-سامانه داخلی ثبت و تحلیل تولید خطوط پت، پرک، هاتواش و گرانول.
+Varan MIS is a Persian production management and reporting system for PET,
+flake, hotwash, and granule production lines.
 
-## اجرا
+The current implementation is a Django application with server-rendered pages,
+SQLite storage, role-based access, KPI dashboards, daily and comparison reports,
+and PDF/Excel exports.
 
-```bat
-start.bat
-```
+## Start Here
 
-بعد از اجرا:
+- [Project memory and handoff rules](AGENTS.md)
+- [Documentation index](docs/README.md)
+- [Current status](docs/CURRENT_STATUS.md)
+- [Handoff for the next agent](docs/HANDOFF.md)
+- [Requirements](docs/REQUIREMENTS.md)
+- [Business rules](docs/BUSINESS_RULES.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Database](docs/DATABASE.md)
+- [Security](docs/SECURITY.md)
+- [Setup](docs/SETUP.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Backlog](docs/BACKLOG.md)
+- [UML diagrams](docs/uml/README.md)
 
-- برنامه: http://127.0.0.1:8000
-- پنل مدیریت: http://127.0.0.1:8000/admin/
-
-## کاربران نمونه
-
-```text
-Admin:
-username: admin
-password: Admin@12345
-
-Registrar:
-username: registrar
-password: Registrar@12345
-
-Viewer:
-username: viewer
-password: Viewer@12345
-```
-
-## راه‌اندازی مجدد پیش‌نیازها
+## Local Run
 
 ```bat
 setup.bat
+start.bat
 ```
 
-## امکانات
+After startup:
 
-- تعریف گروه محصول و محصول
-- تعریف خطوط تولید
-- تعریف شیفت و اپراتور
-- تعریف مواد اولیه
-- تعریف نوع ضایعات با دسته‌بندی قابل مصرف مجدد، فروشی یا دورریز
-- ثبت گزارش تولید با تاریخ، شیفت، اپراتور، تعداد نفرات، خط و محصول
-- ثبت مصرف مواد اولیه برای هر گزارش
-- ثبت ضایعات تفکیکی برای هر گزارش
-- جلوگیری قطعی از ثبت بیش از یک آمار برای هر تاریخ، خط و شیفت
-- داشبورد خلاصه KPI با تفکیک گروه محصول، خط و بازه تاریخ
-- مرکز گزارش‌های کاربردمحور برای مدیرعامل، کارخانه، تولید، برنامه‌ریزی و فروش
-- گزارش روزانه و گزارش مقایسه‌ای روزانه/ماهانه
-- تفکیک گروه محصول، خط، محصول، شیفت، اپراتور، مواد اولیه و انواع ضایعات
-- خروجی PDF و Excel برای داشبورد، همه گزارش‌ها و جزئیات هر ثبت
-- نمودارهای دارای عدد و جدول‌های مدیریتی قابل فیلتر
-- نقش‌های Admin، Registrar و Viewer
+- App: http://127.0.0.1:8000
+- Admin: http://127.0.0.1:8000/admin/
+
+## Manual Commands
+
+```powershell
+.\.venv\Scripts\python.exe manage.py check
+.\.venv\Scripts\python.exe manage.py test
+.\.venv\Scripts\python.exe manage.py runserver
+```
+
+## Configuration
+
+Copy `.env.example` to `.env` and set real local or production values. Never
+commit real passwords, API keys, access tokens, cookies, private keys, or
+production connection strings.
+
+## Repository Memory
+
+This repository is intended to be the transferable source of truth for project
+state. A new Codex run should read `AGENTS.md` and the key files under `docs/`
+before making changes.

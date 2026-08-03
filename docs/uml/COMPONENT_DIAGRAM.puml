@@ -1,0 +1,44 @@
+@startuml
+title Varan MIS - Django Components
+
+package "varanmis" {
+  component "settings.py" as Settings
+  component "urls.py" as RootUrls
+}
+
+package "production" {
+  component "models.py" as Models
+  component "forms.py" as Forms
+  component "views.py" as Views
+  component "permissions.py" as Permissions
+  component "analytics.py" as Analytics
+  component "management_reports.py" as MgmtReports
+  component "pdf_reports.py" as Pdf
+  component "excel_reports.py" as Excel
+  component "admin.py" as Admin
+  component "urls.py" as Urls
+}
+
+package "templates/static" {
+  component "Django Templates" as Templates
+  component "cascade.js" as Cascade
+  component "charts.js" as Charts
+  component "style.css" as Css
+}
+
+RootUrls --> Urls
+Views --> Permissions
+Views --> Forms
+Views --> Models
+Views --> Analytics
+Views --> MgmtReports
+Views --> Pdf
+Views --> Excel
+Forms --> Models
+Admin --> Models
+Templates --> Views
+Cascade --> Forms
+Charts --> Templates
+Settings --> Models
+
+@enduml
