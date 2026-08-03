@@ -7,6 +7,7 @@
   <a class="button" href="{% url 'production:reports_hub' %}">گزارش‌های تخصصی</a>
 </header>
 {% include "production/_report_filters.html" %}
+{% with tables=daily_group_tables %}{% include "production/_tables.html" %}{% endwith %}
 {% include "production/_kpis.html" %}
 <section class="insight-grid compact-insights">
   {% for insight in insights %}<article class="insight {% if insight.alert %}alert{% endif %}"><span>{{ insight.label }}</span><strong>{{ insight.value }}</strong><small>{{ insight.detail }}</small></article>{% endfor %}

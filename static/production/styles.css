@@ -136,6 +136,12 @@ h2 {
   color: white;
 }
 
+.button.danger {
+  border-color: #b42318;
+  background: #b42318;
+  color: white;
+}
+
 .button.compact {
   padding: 8px 12px;
 }
@@ -482,6 +488,11 @@ textarea {
 .detail-link {
   font-weight: 700;
   border-bottom: 1px solid #0f766e;
+}
+
+.danger-link {
+  color: #b42318;
+  border-bottom-color: #b42318;
 }
 
 .report-catalog {

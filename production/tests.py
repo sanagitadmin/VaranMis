@@ -114,27 +114,25 @@ class ProductionReportTests(TestCase):
         self.assertEqual(MaterialConsumption.objects.count(), 1)
         self.assertEqual(WasteEntry.objects.count(), 1)
 
-    def test_rejects_materials_greater_than_total_production(self):
+    def test_allows_materials_greater_than_total_production(self):
         client = self.registrar_client()
         response = client.post(
             reverse("production:report_create"),
             self.report_payload(**{"materials-0-quantity": "1100"}),
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "مجموع مصرف مواد اولیه نمی‌تواند از تولید کل بیشتر باشد")
-        self.assertEqual(ProductionReport.objects.count(), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ProductionReport.objects.count(), 1)
 
-    def test_rejects_useful_plus_waste_greater_than_total(self):
+    def test_allows_useful_plus_waste_greater_than_total(self):
         client = self.registrar_client()
         response = client.post(
             reverse("production:report_create"),
             self.report_payload(useful_production="950", **{"wastes-0-quantity": "80"}),
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "جمع تولید مفید و ضایعات نمی‌تواند از تولید کل بیشتر باشد")
-        self.assertEqual(ProductionReport.objects.count(), 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ProductionReport.objects.count(), 1)
 
     def test_allows_useful_plus_waste_less_than_total(self):
         client = self.registrar_client()
@@ -236,6 +234,71 @@ class ProductionReportTests(TestCase):
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
+    def test_registrar_can_update_report(self):
+        report = ProductionReport.objects.create(
+            report_date="2026-07-29",
+            shift=self.shift,
+            operator=self.operator,
+            crew_count=8,
+            line=self.line,
+            product=self.product,
+            total_production=1000,
+            useful_production=920,
+        )
+        client = self.registrar_client()
+
+        response = client.post(
+            reverse("production:report_update", args=[report.pk]),
+            self.report_payload(
+                report_date="2026-07-29",
+                total_production="1800",
+                useful_production="1700",
+            ),
+        )
+
+        report.refresh_from_db()
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(report.total_production, 1800)
+        self.assertEqual(report.useful_production, 1700)
+
+    def test_registrar_can_delete_report(self):
+        report = ProductionReport.objects.create(
+            report_date="2026-07-29",
+            shift=self.shift,
+            operator=self.operator,
+            crew_count=8,
+            line=self.line,
+            product=self.product,
+            total_production=1000,
+            useful_production=920,
+        )
+        client = self.registrar_client()
+
+        response = client.post(reverse("production:report_delete", args=[report.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ProductionReport.objects.count(), 0)
+
+    def test_viewer_cannot_update_or_delete_report(self):
+        report = ProductionReport.objects.create(
+            report_date="2026-07-29",
+            shift=self.shift,
+            operator=self.operator,
+            crew_count=8,
+            line=self.line,
+            product=self.product,
+            total_production=1000,
+            useful_production=920,
+        )
+        client = self.viewer_client()
+
+        update_response = client.get(reverse("production:report_update", args=[report.pk]))
+        delete_response = client.get(reverse("production:report_delete", args=[report.pk]))
+
+        self.assertEqual(update_response.status_code, 302)
+        self.assertEqual(delete_response.status_code, 302)
+        self.assertEqual(ProductionReport.objects.count(), 1)
+
     def test_rejects_second_report_for_same_date_line_and_shift(self):
         ProductionReport.objects.create(
             report_date="2026-07-30",
@@ -263,6 +326,25 @@ class ProductionReportTests(TestCase):
         response = self.viewer_client().get(reverse("production:dashboard"))
 
         self.assertNotContains(response, "تعداد گزارش")
+
+    def test_dashboard_shows_last_seven_days_by_product_group_table(self):
+        ProductionReport.objects.create(
+            report_date="2026-07-30",
+            shift=self.shift,
+            operator=self.operator,
+            crew_count=8,
+            line=self.line,
+            product=self.product,
+            total_production=1500,
+            useful_production=1400,
+        )
+
+        response = self.viewer_client().get(reverse("production:dashboard"))
+        table = response.context["daily_group_tables"][0]
+
+        self.assertEqual(len(table["rows"]), 7)
+        self.assertIn(self.group.name, table["headers"])
+        self.assertEqual(table["headers"][-1], "جمع روز")
 
     def test_viewer_cannot_create_report(self):
         client = self.viewer_client()

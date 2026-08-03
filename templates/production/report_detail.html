@@ -4,7 +4,10 @@
 {% block content %}
 <header class="page-header report-heading">
   <div><span class="eyebrow">{{ report.product.group.name }}</span><h1>جزئیات آمار تولید</h1><p>{{ report.report_date }}، {{ report.line }}، شیفت {{ report.shift }}</p></div>
-  <div class="actions detail-actions"><a class="button" href="{% url 'production:report_detail_pdf' report.pk %}">PDF</a><a class="button" href="{% url 'production:report_detail_excel' report.pk %}">Excel</a><a class="button" href="{% url 'production:report_list' %}">بازگشت</a></div>
+  <div class="actions detail-actions">
+    {% if can_register_reports %}<a class="button primary" href="{% url 'production:report_update' report.pk %}">ویرایش</a><a class="button danger" href="{% url 'production:report_delete' report.pk %}">حذف</a>{% endif %}
+    <a class="button" href="{% url 'production:report_detail_pdf' report.pk %}">PDF</a><a class="button" href="{% url 'production:report_detail_excel' report.pk %}">Excel</a><a class="button" href="{% url 'production:report_list' %}">بازگشت</a>
+  </div>
 </header>
 <section class="record-meta">
   <div><span>گروه محصول</span><strong>{{ report.product.group.name }}</strong></div><div><span>محصول</span><strong>{{ report.product.name }}</strong></div><div><span>اپراتور</span><strong>{{ report.operator }}</strong></div><div><span>تعداد نفرات</span><strong>{{ report.crew_count }}</strong></div>

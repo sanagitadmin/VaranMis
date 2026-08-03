@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}حذف گزارش تولید{% endblock %}
+{% block content %}
+<header class="page-header report-heading">
+  <div>
+    <span class="eyebrow">{{ report.product.group.name }}</span>
+    <h1>حذف گزارش تولید</h1>
+    <p>{{ report.report_date }}، {{ report.line }}، شیفت {{ report.shift }}</p>
+  </div>
+</header>
+
+<section class="panel delete-confirm-panel">
+  <div class="panel-title">
+    <h2>تأیید حذف</h2>
+    <span class="panel-context">این عملیات قابل بازگشت نیست</span>
+  </div>
+  <p>
+    گزارش تولید محصول {{ report.product.name }} با تولید کل {{ report.total_production }} حذف می‌شود.
+  </p>
+  <form method="post" class="actions">
+    {% csrf_token %}
+    <button class="button danger" type="submit">حذف گزارش</button>
+    <a class="button" href="{% url 'production:report_detail' report.pk %}">انصراف</a>
+  </form>
+</section>
+{% endblock %}

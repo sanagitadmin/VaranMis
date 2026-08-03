@@ -19,11 +19,21 @@ FONT_BOLD = "Tahoma-Bold"
 
 
 def register_fonts():
-    regular = Path("C:/Windows/Fonts/tahoma.ttf")
-    bold = Path("C:/Windows/Fonts/tahomabd.ttf")
-    if FONT_REGULAR not in pdfmetrics.getRegisteredFontNames() and regular.exists():
+    regular_candidates = [
+        Path("C:/Windows/Fonts/tahoma.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("/usr/share/fonts/truetype/noto/NotoNaskhArabic-Regular.ttf"),
+    ]
+    bold_candidates = [
+        Path("C:/Windows/Fonts/tahomabd.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
+        Path("/usr/share/fonts/truetype/noto/NotoNaskhArabic-Bold.ttf"),
+    ]
+    regular = next((path for path in regular_candidates if path.exists()), None)
+    bold = next((path for path in bold_candidates if path.exists()), regular)
+    if regular and FONT_REGULAR not in pdfmetrics.getRegisteredFontNames():
         pdfmetrics.registerFont(TTFont(FONT_REGULAR, str(regular)))
-    if FONT_BOLD not in pdfmetrics.getRegisteredFontNames() and bold.exists():
+    if bold and FONT_BOLD not in pdfmetrics.getRegisteredFontNames():
         pdfmetrics.registerFont(TTFont(FONT_BOLD, str(bold)))
 
 

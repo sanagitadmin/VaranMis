@@ -13,16 +13,16 @@ def has_role(user, role):
 
 def can_view(user):
     return user.is_authenticated and (
-        has_role(user, ROLE_ADMIN) or has_role(user, ROLE_REGISTRAR) or has_role(user, ROLE_VIEWER)
+        user.is_superuser or has_role(user, ROLE_ADMIN) or has_role(user, ROLE_REGISTRAR) or has_role(user, ROLE_VIEWER)
     )
 
 
 def can_register(user):
-    return user.is_authenticated and (has_role(user, ROLE_ADMIN) or has_role(user, ROLE_REGISTRAR))
+    return user.is_authenticated and (user.is_superuser or has_role(user, ROLE_ADMIN) or has_role(user, ROLE_REGISTRAR))
 
 
 def can_manage(user):
-    return user.is_authenticated and has_role(user, ROLE_ADMIN)
+    return user.is_authenticated and (user.is_superuser or has_role(user, ROLE_ADMIN))
 
 
 def view_required(view_func):

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}ثبت گزارش تولید{% endblock %}
+{% block title %}{{ form_title|default:"ثبت گزارش تولید" }}{% endblock %}
 {% block content %}
 <header class="page-header">
   <div>
-    <h1>ثبت گزارش تولید</h1>
+    <h1>{{ form_title|default:"ثبت گزارش تولید" }}</h1>
     <p>تاریخ، شیفت، اپراتور، خط، محصول، تولید، مواد مصرفی و ضایعات را ثبت کنید.</p>
   </div>
 </header>
@@ -93,8 +93,8 @@
   </section>
 
   <div class="actions">
-    <button class="button primary" type="submit">ثبت گزارش</button>
-    <a class="button" href="{% url 'production:dashboard' %}">بازگشت</a>
+    <button class="button primary" type="submit">{{ submit_label|default:"ثبت گزارش" }}</button>
+    <a class="button" href="{{ cancel_url|default:'/' }}">بازگشت</a>
   </div>
 </form>
 {% load static %}

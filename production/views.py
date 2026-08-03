@@ -1,8 +1,10 @@
+from datetime import timedelta
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.management import call_command
 from django.db import IntegrityError, transaction
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -26,6 +28,38 @@ REPORT_DEFAULT_DAYS = {
     "daily": 7,
     "comparison": 365,
 }
+
+
+def _dashboard_daily_group_table(days=7):
+    end = timezone.localdate()
+    start = end - timedelta(days=days - 1)
+    groups = list(ProductGroup.objects.order_by("name").values_list("id", "name"))
+    group_names = [name for _, name in groups]
+    group_index = {group_id: index for index, (group_id, _) in enumerate(groups)}
+    daily_rows = {
+        start + timedelta(days=offset): [0 for _ in groups]
+        for offset in range(days)
+    }
+    totals = (
+        ProductionReport.objects.filter(report_date__gte=start, report_date__lte=end)
+        .values("report_date", "product__group_id")
+        .annotate(total=Sum("total_production"))
+        .order_by("report_date")
+    )
+    for item in totals:
+        date = item["report_date"]
+        group_id = item["product__group_id"]
+        if date in daily_rows and group_id in group_index:
+            daily_rows[date][group_index[group_id]] = item["total"] or 0
+
+    rows = []
+    for date, values in daily_rows.items():
+        rows.append([date, *values, sum(values)])
+    return {
+        "title": "جمع تولید روزانه ۷ روز آخر به تفکیک گروه محصول",
+        "headers": ["تاریخ", *group_names, "جمع روز"],
+        "rows": rows,
+    }
 
 
 def _safe_int(value):
@@ -113,6 +147,7 @@ def _export_management(request, kind, export_type):
 @view_required
 def dashboard(request):
     context = _management_context(request, "executive")
+    context["daily_group_tables"] = [_dashboard_daily_group_table()]
     context["dashboard_tables"] = context["tables"][:2]
     context["pdf_url"] = reverse("production:dashboard_pdf")
     context["excel_url"] = reverse("production:dashboard_excel")
@@ -417,33 +452,6 @@ def report_detail_excel(request, pk):
     )
 
 
-def _sum_formset_quantity(formset):
-    total = 0
-    for row in formset.forms:
-        if not getattr(row, "cleaned_data", None) or row.cleaned_data.get("DELETE"):
-            continue
-        total += row.cleaned_data.get("quantity") or 0
-    return total
-
-
-def _validate_material_balance(form, material_formset, waste_formset):
-    material_total = _sum_formset_quantity(material_formset)
-    waste_total = _sum_formset_quantity(waste_formset)
-    useful = form.cleaned_data.get("useful_production") or 0
-    total = form.cleaned_data.get("total_production") or 0
-    valid = True
-    if total > 0 and material_total <= 0:
-        form.add_error(None, "برای گزارش دارای تولید، ثبت حداقل یک ماده اولیه مصرفی الزامی است.")
-        valid = False
-    if useful + waste_total > total:
-        form.add_error(None, "جمع تولید مفید و ضایعات نمی‌تواند از تولید کل بیشتر باشد.")
-        valid = False
-    if material_total > total:
-        form.add_error(None, "مجموع مصرف مواد اولیه نمی‌تواند از تولید کل بیشتر باشد.")
-        valid = False
-    return valid
-
-
 @register_required
 def report_create(request):
     if request.method == "POST":
@@ -453,12 +461,7 @@ def report_create(request):
         material_formset = MaterialConsumptionFormSet(request.POST, prefix="materials", group=group)
         waste_formset = WasteEntryFormSet(request.POST, prefix="wastes", group=group)
         formsets_valid = material_formset.is_valid() and waste_formset.is_valid()
-        balance_valid = (
-            _validate_material_balance(form, material_formset, waste_formset)
-            if form_valid and formsets_valid
-            else False
-        )
-        if form_valid and formsets_valid and balance_valid:
+        if form_valid and formsets_valid:
             try:
                 with transaction.atomic():
                     report = form.save()
@@ -483,8 +486,70 @@ def report_create(request):
             "form": form,
             "material_formset": material_formset,
             "waste_formset": waste_formset,
+            "form_title": "ثبت گزارش تولید",
+            "submit_label": "ثبت گزارش",
+            "cancel_url": reverse("production:dashboard"),
         },
     )
+
+
+@register_required
+def report_update(request, pk):
+    report = get_object_or_404(
+        ProductionReport.objects.select_related("product__group", "line", "shift", "operator"),
+        pk=pk,
+    )
+    if request.method == "POST":
+        form = ProductionReportForm(request.POST, instance=report)
+        form_valid = form.is_valid()
+        group = form.cleaned_data.get("product_group") if form_valid else None
+        material_formset = MaterialConsumptionFormSet(request.POST, instance=report, prefix="materials", group=group)
+        waste_formset = WasteEntryFormSet(request.POST, instance=report, prefix="wastes", group=group)
+        formsets_valid = material_formset.is_valid() and waste_formset.is_valid()
+        if form_valid and formsets_valid:
+            try:
+                with transaction.atomic():
+                    report = form.save()
+                    material_formset.instance = report
+                    waste_formset.instance = report
+                    material_formset.save()
+                    waste_formset.save()
+            except IntegrityError:
+                form.add_error(None, "برای این تاریخ، خط و شیفت قبلاً آمار ثبت شده است.")
+            else:
+                messages.success(request, "گزارش تولید ویرایش شد.")
+                return redirect("production:report_detail", pk=report.pk)
+    else:
+        form = ProductionReportForm(instance=report)
+        material_formset = MaterialConsumptionFormSet(instance=report, prefix="materials")
+        waste_formset = WasteEntryFormSet(instance=report, prefix="wastes")
+
+    return render(
+        request,
+        "production/report_form.html",
+        {
+            "form": form,
+            "material_formset": material_formset,
+            "waste_formset": waste_formset,
+            "report": report,
+            "form_title": "ویرایش گزارش تولید",
+            "submit_label": "ذخیره تغییرات",
+            "cancel_url": reverse("production:report_detail", args=[report.pk]),
+        },
+    )
+
+
+@register_required
+def report_delete(request, pk):
+    report = get_object_or_404(
+        ProductionReport.objects.select_related("product__group", "line", "shift", "operator"),
+        pk=pk,
+    )
+    if request.method == "POST":
+        report.delete()
+        messages.success(request, "گزارش تولید حذف شد.")
+        return redirect("production:report_list")
+    return render(request, "production/report_confirm_delete.html", {"report": report})
 
 
 @admin_required
